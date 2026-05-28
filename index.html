@@ -1,76 +1,53 @@
-```html
+``
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>護眼小精靈的能量大冒險 v2.0</title>
-  <!-- 載入 React 18 與 ReactDOM CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>護眼小精靈的能量大冒險 v3.0 - 適配版</title>
+  <!-- 載入 React 18 與 ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <!-- 載入 Babel 用於瀏覽器即時編譯 JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- 載入 Tailwind CSS CDN -->
+  <!-- 載入 Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
+    /* 彈性流暢動畫 */
     @keyframes bounce-slow {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-8px);
-      }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
-
     .animate-bounce-slow {
-      animation: bounce-slow 2.5s ease-in-out infinite;
+      animation: bounce-slow 3s ease-in-out infinite;
     }
 
     @keyframes slide-up {
-      from {
-        transform: translateY(100%);
-      }
-      to {
-        transform: translateY(0);
-      }
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
-
     .animate-slide-up {
-      animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     @keyframes fade-in {
-      from {
-        opacity: 0;
-        transform: scale(0.98);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
     }
-
     .animate-fade-in {
-      animation: fade-in 0.2s ease-out forwards;
+      animation: fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     @keyframes pulse-slow {
-      0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-      50% {
-        opacity: 0.95;
-        transform: scale(1.02);
-      }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.95; transform: scale(1.02); }
     }
-
     .animate-pulse-slow {
       animation: pulse-slow 3s ease-in-out infinite;
     }
 
-    /* 隱藏滾動條但保持滾動功能 */
+    /* 隱藏全平台滾動條 */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -78,17 +55,23 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    /* 優化 iOS 行動端橡皮筋回彈與點擊高亮 */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
   </style>
 </head>
-<body class="bg-slate-900 min-h-screen flex items-center justify-center p-0 md:p-4 font-sans antialiased text-slate-800">
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-0 sm:p-4 md:p-6 font-sans antialiased text-slate-800 selection:bg-indigo-200">
 
   <!-- React 掛載點 -->
-  <div id="root" class="w-full max-w-md"></div>
+  <div id="root" class="w-full flex justify-center items-center"></div>
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
-    // --- 音效生成器 (Web Audio API) ---
+    // --- 音效生成器 (純 Web Audio API 程式合成音，100% 離線可用) ---
     const playSound = (type) => {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -101,7 +84,7 @@
           osc.type = 'sine';
           osc.frequency.setValueAtTime(600, ctx.currentTime);
           osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
-          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
           gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
           osc.connect(gain);
           gain.connect(ctx.destination);
@@ -116,7 +99,7 @@
             osc.type = 'triangle';
             osc.frequency.value = f;
             gain.gain.setValueAtTime(0, now);
-            gain.gain.linearRampToValueAtTime(0.12, now + i * 0.08 + 0.02);
+            gain.gain.linearRampToValueAtTime(0.1, now + i * 0.08 + 0.02);
             gain.gain.linearRampToValueAtTime(0, now + i * 0.08 + 0.2);
             osc.connect(gain);
             gain.connect(ctx.destination);
@@ -128,9 +111,9 @@
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(300, now);
-          osc.frequency.linearRampToValueAtTime(450, now + 0.15);
-          osc.frequency.linearRampToValueAtTime(300, now + 0.3);
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.linearRampToValueAtTime(480, now + 0.15);
+          osc.frequency.linearRampToValueAtTime(320, now + 0.3);
           gain.gain.setValueAtTime(0.08, now);
           gain.gain.linearRampToValueAtTime(0.08, now + 0.2);
           gain.gain.linearRampToValueAtTime(0, now + 0.3);
@@ -143,11 +126,11 @@
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(120, now);
-          osc.frequency.linearRampToValueAtTime(140, now + 0.5);
-          osc.frequency.linearRampToValueAtTime(120, now + 1.0);
-          gain.gain.setValueAtTime(0.03, now);
-          gain.gain.linearRampToValueAtTime(0.03, now + 0.8);
+          osc.frequency.setValueAtTime(110, now);
+          osc.frequency.linearRampToValueAtTime(130, now + 0.5);
+          osc.frequency.linearRampToValueAtTime(110, now + 1.0);
+          gain.gain.setValueAtTime(0.02, now);
+          gain.gain.linearRampToValueAtTime(0.02, now + 0.8);
           gain.gain.linearRampToValueAtTime(0, now + 1.0);
           osc.connect(gain);
           gain.connect(ctx.destination);
@@ -159,7 +142,7 @@
       }
     };
 
-    // --- 內建精美 SVG 自適應圖標元件 (取代外部 Lucide-React 圖標，保證 100% 離線可用) ---
+    // --- 自定義 SVG 向量圖示元件，保障任何裝置皆不失真且免聯網讀取 ---
     const Icon = ({ name, size = 16, className = "" }) => {
       const icons = {
         tv: <path d="M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8zm10-6L7 6m10 0l-5-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>,
@@ -180,7 +163,8 @@
         "shopping-bag": <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></g>,
         award: <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></g>,
         smile: <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></g>,
-        pencil: <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        pencil: <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>,
+        clock: <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 15"/></g>
       };
       return (
         <svg width={size} height={size} viewBox="0 0 24 24" className={className} fill="none">
@@ -189,7 +173,7 @@
       );
     };
 
-    // --- 精靈資料定義 ---
+    // --- 精靈夥伴資料定義 ---
     const PIXIES = [
       {
         id: 'alu',
@@ -202,16 +186,12 @@
         emoji: '🌱',
         primaryColor: '#10b981',
         svgBody: (color, isTired, isSleeping) => (
-          <svg viewBox="0 0 100 100" className="w-36 h-36 drop-shadow-lg animate-bounce-slow">
-            {/* Leaf on top */}
+          <svg viewBox="0 0 100 100" className="w-32 h-32 md:w-36 md:h-36 drop-shadow-lg animate-bounce-slow">
             <path d="M 50 15 C 40 5, 30 20, 50 25 C 60 15, 65 5, 50 15 Z" fill="#047857" />
             <rect x="48" y="22" width="4" height="8" fill="#5c3d2e" />
-            {/* Main Body */}
             <rect x="25" y="30" width="50" height="50" rx="25" fill={color} />
-            {/* Blushing cheeks */}
             <circle cx="36" cy="62" r="6" fill="#f87171" opacity="0.6" />
             <circle cx="64" cy="62" r="6" fill="#f87171" opacity="0.6" />
-            {/* Eyes based on state */}
             {isSleeping ? (
               <>
                 <path d="M 30 55 Q 36 60 42 55" stroke="#111827" strokeWidth="3" fill="none" strokeLinecap="round" />
@@ -232,7 +212,6 @@
                 <circle cx="66" cy="52" r="2" fill="#ffffff" />
               </>
             )}
-            {/* Mouth */}
             {isSleeping ? (
               <path d="M 47 68 Q 50 71 53 68" stroke="#111827" strokeWidth="2.5" fill="none" strokeLinecap="round" />
             ) : isTired ? (
@@ -254,17 +233,13 @@
         emoji: '🍑',
         primaryColor: '#f43f5e',
         svgBody: (color, isTired, isSleeping) => (
-          <svg viewBox="0 0 100 100" className="w-36 h-36 drop-shadow-lg animate-bounce-slow">
-            {/* Heart antenna */}
+          <svg viewBox="0 0 100 100" className="w-32 h-32 md:w-36 md:h-36 drop-shadow-lg animate-bounce-slow">
             <path d="M 44 15 Q 40 8, 44 4 Q 50 0, 50 12" stroke="#e11d48" strokeWidth="2" fill="none" />
             <path d="M 56 15 Q 60 8, 56 4 Q 50 0, 50 12" stroke="#e11d48" strokeWidth="2" fill="none" />
             <path d="M 50 8 A 2.5 2.5 0 0 0 46 11 L 50 15 L 54 11 A 2.5 2.5 0 0 0 50 8" fill="#e11d48" />
-            {/* Main Body (Peach shape) */}
             <path d="M 50 30 C 75 30, 80 50, 75 70 C 70 85, 52 87, 50 87 C 48 87, 30 85, 25 70 C 20 50, 25 30, 50 30 Z" fill={color} />
-            {/* Blushing cheeks */}
             <circle cx="34" cy="64" r="7" fill="#f43f5e" opacity="0.5" />
             <circle cx="66" cy="64" r="7" fill="#f43f5e" opacity="0.5" />
-            {/* Eyes */}
             {isSleeping ? (
               <>
                 <path d="M 28 58 Q 35 63 42 58" stroke="#4c0519" strokeWidth="3" fill="none" strokeLinecap="round" />
@@ -287,7 +262,6 @@
                 <circle cx="63" cy="58" r="1" fill="#ffffff" />
               </>
             )}
-            {/* Mouth */}
             {isSleeping ? (
               <circle cx="50" cy="70" r="3" fill="#4c0519" />
             ) : isTired ? (
@@ -305,17 +279,14 @@
         borderColor: 'border-sky-300',
         bgLight: 'bg-sky-50',
         textColor: 'text-sky-600',
-        desc: '純淨的小水滴精靈，喜歡滋潤乾澀的雙眼。哭點很低，你盯太久螢幕牠會心疼落淚喔！',
+        desc: '純淨的小水滴精靈，喜歡滋潤乾澀的雙眼。對螢幕光線敏感，需要定時帶他休息。',
         emoji: '💧',
         primaryColor: '#0ea5e9',
         svgBody: (color, isTired, isSleeping) => (
-          <svg viewBox="0 0 100 100" className="w-36 h-36 drop-shadow-lg animate-bounce-slow">
-            {/* Waterdrop Body */}
+          <svg viewBox="0 0 100 100" className="w-32 h-32 md:w-36 md:h-36 drop-shadow-lg animate-bounce-slow">
             <path d="M 50 15 C 75 45, 80 60, 75 75 C 70 87, 50 90, 50 90 C 50 90, 30 87, 25 75 C 20 60, 25 45, 50 15 Z" fill={color} />
-            {/* Blushing cheeks */}
             <circle cx="34" cy="66" r="5" fill="#38bdf8" opacity="0.8" />
             <circle cx="66" cy="66" r="5" fill="#38bdf8" opacity="0.8" />
-            {/* Eyes */}
             {isSleeping ? (
               <>
                 <path d="M 30 60 Q 35 65 40 60" stroke="#0c4a6e" strokeWidth="3" fill="none" strokeLinecap="round" />
@@ -335,7 +306,6 @@
                 <circle cx="67" cy="56" r="2" fill="#ffffff" />
               </>
             )}
-            {/* Mouth */}
             {isSleeping ? (
               <path d="M 47 72 L 53 72" stroke="#0c4a6e" strokeWidth="2.5" strokeLinecap="round" />
             ) : isTired ? (
@@ -357,43 +327,48 @@
       { id: 'gold_crown', name: '榮耀黃金皇冠', emoji: '👑', price: 150, type: 'head' }
     ];
 
-    // --- 實體冒險任務庫 ---
+    // --- 實體冒險任務庫 (新增 minScreenTime 欄位，實現依家長設定時間派出相對任務) ---
+    // 規則設定：
+    // - minScreenTime = 0 (適用於任何時間長度，通常是短暫放鬆)
+    // - minScreenTime = 16 (適用於 16 分鐘以上的用眼放鬆，中等活動)
+    // - minScreenTime = 30 (只在連續看螢幕達 30 分鐘以上時派發，強度較高的大肌肉伸展運動)
     const DEFAULT_QUESTS = [
-      { id: 1, text: '🔍【綠野偵探】走到窗戶旁邊，找出遠方 3 個綠色的植物或大樹，盯著看 10 秒鐘。', category: 'vision', categoryName: '遠眺放鬆' },
-      { id: 2, text: '🦘【快樂袋鼠】在客廳的地板像袋鼠一樣，雙手抱在胸前雙腳跳躍 10 下！', category: 'body', categoryName: '大肢體活動' },
-      { id: 3, text: '👂【聲音特工】閉上雙眼，像貓咪一樣安靜聆聽 30 秒，說出你聽到外面的 3 種聲音。', category: 'mind', categoryName: '眼部休息' },
-      { id: 4, text: '🧦【襪子魔法師】去曬衣架或抽屜，把 3 雙落單的襪子找到配對，滾成球滾進籃子裡。', category: 'chore', categoryName: '家事認知' },
-      { id: 5, text: '✈️【掌心熱氣球】雙手掌心用力互相摩擦，直到發熱，再輕輕蓋在閉上的眼睛上 15 秒。', category: 'vision', categoryName: '熱敷放鬆' },
-      { id: 6, text: '🦒【長頸鹿伸展】雙手高舉向天空指，脖子慢慢往上看、再左右轉轉，假裝自己是長頸鹿吃高處的樹葉。', category: 'body', categoryName: '大肢體活動' }
+      { id: 1, text: '✈️【掌心熱氣球】雙手掌心用力互相摩擦，直到感覺熱熱的，再輕輕蓋在閉上的眼睛上 15 秒。', category: 'vision', categoryName: '快速熱敷', minScreenTime: 0 },
+      { id: 2, text: '👀【眨眼韻律操】看著牆壁，用力閉上眼睛 2 秒，再睜開大眼睛 2 秒，連續重複 10 次！', category: 'mind', categoryName: '眼部滋潤', minScreenTime: 0 },
+      { id: 3, text: '🔍【綠野偵探】走到窗戶或陽台旁邊，找出遠方 3 個綠色的植物、大樹或招牌，盯著看 15 秒鐘。', category: 'vision', categoryName: '遠眺放鬆', minScreenTime: 16 },
+      { id: 4, text: '👂【聲音特工】閉上雙眼，像貓咪一樣安靜聆聽 30 秒，說出你聽到外面的 3 種聲音。', category: 'mind', categoryName: '全感放鬆', minScreenTime: 16 },
+      { id: 5, text: '🧦【襪子配對魔法】去曬衣架或收屜，幫忙找出 3 雙一樣花色的襪子捲在一起，放回抽屜。', category: 'chore', categoryName: '輕家事活動', minScreenTime: 16 },
+      { id: 6, text: '🦘【快樂袋鼠】在客廳安全的地板上像袋鼠一樣，雙手抱在胸前，雙腳用力跳躍 15 下！', category: 'body', categoryName: '大肌肉消耗', minScreenTime: 30 },
+      { id: 7, text: '🦒【長頸鹿伸展】雙手高高舉起指向天空，脖子慢慢往上看、再左右緩慢轉動，像長頸鹿在吃高處的樹葉。', category: 'body', categoryName: '全身大伸展', minScreenTime: 30 }
     ];
 
     // --- 快捷貼紙設定 ---
     const QUICK_NOTES = [
-      { text: '🌲 看到了 3 棵大樹', category: 'vision' },
-      { text: '☁️ 看到天上的白雲', category: 'vision' },
-      { text: '🦘 開心地跳了 15 下', category: 'body' },
-      { text: '🐈 做了 3 次全身伸展', category: 'body' },
-      { text: '🕊️ 聽到外面的小鳥叫聲', category: 'mind' },
-      { text: '🚗 聽到馬路上的開車聲', category: 'mind' },
-      { text: '🧦 幫忙摺好了 3 雙襪子', category: 'chore' },
-      { text: '🥛 自己把水杯收乾淨了', category: 'chore' }
+      { text: '🌲 看到了窗外茂盛的綠色大樹', category: 'vision' },
+      { text: '☁️ 看到天空中飄過去一朵可愛的雲', category: 'vision' },
+      { text: '🦘 在客廳安全的地方用力跳了15下', category: 'body' },
+      { text: '🦒 像長頸鹿一樣做了全身大伸展', category: 'body' },
+      { text: '🕊️ 閉上眼睛聽到了外面的小鳥叫聲', category: 'mind' },
+      { text: '🚗 聽到馬路上大卡車開過去的聲音', category: 'mind' },
+      { text: '🧦 認真幫爸爸媽媽摺好了3雙襪子', category: 'chore' },
+      { text: '🥛 自己把喝完水的水杯洗好放整齊', category: 'chore' }
     ];
 
     function App() {
       // --- 核心遊戲狀態 ---
-      const [gameState, setGameState] = useState('welcome'); // 'welcome' | 'dashboard' | 'resting' | 'success' | 'shop' | 'closet'
+      const [gameState, setGameState] = useState('welcome'); 
       const [kidName, setKidName] = useState('');
       const [selectedPixieId, setSelectedPixieId] = useState('alu');
       const [soundEnabled, setSoundEnabled] = useState(true);
       
-      // 遊戲幣與背包
+      // 遊戲幣與衣櫃
       const [crystals, setCrystals] = useState(100); 
       const [ownedItems, setOwnedItems] = useState([]);
       const [equippedItems, setEquippedItems] = useState({ head: null, eyes: null, hand: null, bed: null });
 
       // 倒數計時狀態 (用眼/休息)
       const [timerMode, setTimerMode] = useState('screen'); 
-      const [screenTimeSetting, setScreenTimeSetting] = useState(20); 
+      const [screenTimeSetting, setScreenTimeSetting] = useState(20); // 家長可自由設定的用眼分鐘數
       const [breakTimeSetting, setBreakTimeSetting] = useState(5); 
       const [timeLeft, setTimeLeft] = useState(20 * 60);
       const [isActive, setIsActive] = useState(false);
@@ -402,50 +377,62 @@
       // 當前隨機抽取任務
       const [currentQuest, setCurrentQuest] = useState(null);
 
-      // 休息模式日記記錄
+      // 休息日記記錄
       const [restingNote, setRestingNote] = useState(''); 
       const [eyeComfortScore, setEyeComfortScore] = useState('good'); 
       const [lastSavedLog, setLastSavedLog] = useState(null); 
 
       // 歷史數據紀錄
       const [historyLogs, setHistoryLogs] = useState([
-        { id: 1, time: '早上 09:30', name: '綠萌萌', action: '完成「遠眺放鬆」任務', note: '看了窗外好大一隻綠色蜥蜴和榕樹！', comfort: 'good', reward: 15 },
-        { id: 2, time: '下午 02:15', name: '綠萌萌', action: '完成「大肢體活動」任務', note: '在客廳客串袋鼠跳了整整12次，腳好痠！', comfort: 'medium', reward: 20 }
+        { id: 1, time: '早上 09:30', name: '綠萌萌', action: '完成「遠眺放鬆」任務', note: '看著窗外好高好綠的大王椰子樹！', comfort: 'good', reward: 15 },
+        { id: 2, time: '下午 02:15', name: '綠萌萌', action: '完成「大肌肉消耗」任務', note: '連續跳了15下，身體都熱烘烘的了！', comfort: 'medium', reward: 20 }
       ]);
       
       // 家長中心
       const [parentModalOpen, setParentModalOpen] = useState(false);
       const [parentPinSolved, setParentPinSolved] = useState(false);
       const [parentMathQuiz, setParentMathQuiz] = useState({ num1: 0, num2: 0, ans: '' });
-      const [parentError, setParentError] = useState(''); // 心算錯誤提示 (替代傳統 alert)
+      const [parentError, setParentError] = useState(''); 
       const [customQuests, setCustomQuests] = useState(DEFAULT_QUESTS);
       const [newQuestText, setNewQuestText] = useState('');
       const [newQuestCategory, setNewQuestCategory] = useState('body');
+      const [newQuestMinTime, setNewQuestMinTime] = useState(15); // 新自訂任務的門檻時間
 
       const selectedPixie = PIXIES.find(p => p.id === selectedPixieId) || PIXIES[0];
       const timerRef = useRef(null);
 
-      // 模擬沙盒：直接觸發時間到
+      // 測試沙盒：直接觸發時間到
       const forceTimeOut = () => {
         if (soundEnabled) playSound('alarm');
         setIsActive(false);
         triggerBreakMode();
       };
 
-      // 觸發休息模式
+      // 觸發休息模式：!!! 核心重構：依據家長設定用眼時間 (screenTimeSetting) 智慧派發相對應任務 !!!
       const triggerBreakMode = () => {
         setTimerMode('break');
         setTimeLeft(breakTimeSetting * 60);
         setRestingNote('');
         setEyeComfortScore('good');
         
-        const randomIndex = Math.floor(Math.random() * customQuests.length);
-        setCurrentQuest(customQuests[randomIndex] || DEFAULT_QUESTS[0]);
+        // 篩選最適合當前家長設定用眼時間的任務
+        // 如果用眼設定很短 (<=15分鐘)，只篩選 minScreenTime <= 15 的任務 (偏向輕柔眼部操)
+        // 如果用眼設定中等 (16-29分鐘)，篩選 minScreenTime <= 20 的任務
+        // 如果用眼設定很長 (>=30分鐘)，篩選涵蓋 minScreenTime >= 30 (偏向全身大肌肉運動) 的任務
+        let eligibleQuests = customQuests.filter(q => screenTimeSetting >= q.minScreenTime);
+        
+        // 保險防呆機制：若當前符合條件的任務清單為空，則直接取全部任務
+        if (eligibleQuests.length === 0) {
+          eligibleQuests = customQuests;
+        }
+
+        const randomIndex = Math.floor(Math.random() * eligibleQuests.length);
+        setCurrentQuest(eligibleQuests[randomIndex]);
         setGameState('resting');
         setIsActive(true);
       };
 
-      // 計時器邏輯
+      // 計時器核心
       useEffect(() => {
         if (isActive && timeLeft > 0) {
           const intervalSpeed = isSpeedUp ? 10 : 1000; 
@@ -519,7 +506,7 @@
       // 生成家長驗證問答
       const openParentCorner = () => {
         if (soundEnabled) playSound('click');
-        const n1 = Math.floor(Math.random() * 10) + 3;
+        const n1 = Math.floor(Math.random() * 8) + 3;
         const n2 = Math.floor(Math.random() * 8) + 3;
         setParentMathQuiz({ num1: n1, num2: n2, ans: '' });
         setParentPinSolved(false);
@@ -527,7 +514,7 @@
         setParentModalOpen(true);
       };
 
-      // 驗證家長問答 (不使用任何 alert)
+      // 驗證家長問答 (無 browser alert)
       const verifyParentAnswer = () => {
         const correctAnswer = parentMathQuiz.num1 * parentMathQuiz.num2;
         if (parseInt(parentMathQuiz.ans) === correctAnswer) {
@@ -537,7 +524,7 @@
         } else {
           if (soundEnabled) playSound('alarm');
           setParentError('算錯囉！請重新嘗試，或請爸爸媽媽來幫忙！');
-          const n1 = Math.floor(Math.random() * 10) + 3;
+          const n1 = Math.floor(Math.random() * 8) + 3;
           const n2 = Math.floor(Math.random() * 8) + 3;
           setParentMathQuiz({ num1: n1, num2: n2, ans: '' });
         }
@@ -566,7 +553,7 @@
         });
       };
 
-      // 新增自訂任務
+      // 新增自訂任務 (包含家長指派的時間門檻)
       const handleAddQuest = (e) => {
         e.preventDefault();
         if (!newQuestText.trim()) return;
@@ -575,9 +562,10 @@
           text: newQuestText,
           category: newQuestCategory,
           categoryName: 
-            newQuestCategory === 'body' ? '自訂身體動動' :
-            newQuestCategory === 'vision' ? '自訂遠眺遠眺' :
-            newQuestCategory === 'mind' ? '自訂眼部放鬆' : '自訂生活家事'
+            newQuestCategory === 'body' ? '自訂肢體運動' :
+            newQuestCategory === 'vision' ? '自訂綠化遠眺' :
+            newQuestCategory === 'mind' ? '自訂心靈放鬆' : '自訂輕家事學',
+          minScreenTime: parseInt(newQuestMinTime) || 0
         };
         setCustomQuests(prev => [...prev, newQ]);
         setNewQuestText('');
@@ -612,95 +600,98 @@
       };
 
       return (
-        <div className="w-full max-w-md bg-gradient-to-b from-indigo-50 to-blue-50 rounded-[40px] shadow-2xl border-[10px] border-slate-800 overflow-hidden flex flex-col relative aspect-[9/19] max-h-[920px] mx-auto">
+        /* 全載具自我適應外框：在手機上無縫滿版(100dvh)，在平板與電腦桌面上自動收窄為優雅的外框 */
+        <div className="w-full sm:max-w-md bg-gradient-to-b from-indigo-50 to-blue-50 sm:rounded-[36px] shadow-2xl sm:border-[8px] border-slate-800 overflow-hidden flex flex-col relative h-[100dvh] sm:h-[860px] md:h-[900px] transition-all">
           
-          {/* 手機頂部聽筒區 */}
-          <div className="absolute top-0 inset-x-0 h-6 bg-slate-800 z-50 flex justify-center items-center">
+          {/* 行動端頂部避讓劉海區 (僅在 sm 以上顯示裝飾，手機滿版直接微調 padding-top 實現流暢全螢幕) */}
+          <div className="hidden sm:flex absolute top-0 inset-x-0 h-6 bg-slate-800 z-50 justify-center items-center">
             <div className="w-24 h-4 bg-slate-900 rounded-full flex justify-between px-4 items-center">
               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
               <span className="w-10 h-1 bg-slate-700 rounded-full"></span>
             </div>
           </div>
 
-          {/* 狀態列模擬 */}
-          <div className="pt-8 px-6 pb-2 flex justify-between items-center text-xs font-bold text-slate-400 bg-white/40 backdrop-blur-sm z-40 border-b border-slate-100">
+          {/* 頂部導航列 - 智慧留出安全邊距 (IOS SafeArea 支援) */}
+          <div className="pt-4 sm:pt-8 px-5 pb-2 flex justify-between items-center text-xs font-bold text-slate-400 bg-white/50 backdrop-blur-sm z-40 border-b border-slate-100">
             <div className="flex items-center gap-1.5">
-              <Icon name="tv" size={12} className="text-slate-500" />
-              <span>護眼大冒險</span>
+              <Icon name="tv" size={13} className="text-indigo-600" />
+              <span className="text-slate-600">眼部大冒險 v3.0</span>
             </div>
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => { setSoundEnabled(!soundEnabled); playSound('click'); }} 
-                className="p-1 rounded bg-slate-200 hover:bg-slate-300 transition text-slate-700"
+                className="p-1.5 rounded-lg bg-slate-200/80 hover:bg-slate-300 active:scale-90 transition text-slate-700 flex items-center justify-center"
                 title="音效開關"
               >
-                <Icon name={soundEnabled ? "volume-2" : "volume-x"} size={12} />
+                <Icon name={soundEnabled ? "volume-2" : "volume-x"} size={13} />
               </button>
               <button 
                 onClick={openParentCorner} 
-                className="p-1 rounded bg-orange-100 hover:bg-orange-200 text-orange-700 transition flex items-center gap-0.5"
+                className="p-1.5 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-700 active:scale-90 transition flex items-center gap-1 font-black"
               >
                 <Icon name="settings" size={12} />
-                <span>家長控制</span>
+                <span>家長設定</span>
               </button>
             </div>
           </div>
 
-          {/* 頂部水晶槽 */}
-          <div className="bg-white/80 py-2.5 px-6 flex justify-between items-center shadow-sm z-30">
-            <div className="flex items-center gap-2 bg-yellow-100 px-3 py-1 rounded-full border border-yellow-200 animate-pulse-slow">
-              <span className="text-lg">💎</span>
-              <span className="font-extrabold text-yellow-700 text-sm tracking-wider">{crystals} 水晶</span>
+          {/* 能量計量展示列 */}
+          <div className="bg-white/90 py-2 px-5 flex justify-between items-center shadow-sm z-30">
+            <div className="flex items-center gap-1.5 bg-yellow-100/80 px-3 py-1 rounded-full border border-yellow-200 animate-pulse-slow">
+              <span className="text-base">💎</span>
+              <span className="font-extrabold text-yellow-800 text-xs tracking-wider">{crystals} 水晶</span>
             </div>
             {gameState === 'dashboard' && (
-              <div className="flex items-center gap-1 bg-red-50 border border-red-100 px-2.5 py-1 rounded-full text-xs">
+              <div className="flex items-center gap-1.5 bg-red-50 border border-red-100 px-2.5 py-1 rounded-full text-xs">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                 </span>
-                <span className="font-semibold text-red-600">疲勞值 {calculateFatigue()}%</span>
+                <span className="font-bold text-red-600">疲勞值 {calculateFatigue()}%</span>
               </div>
             )}
           </div>
 
-          {/* 遊戲主視窗 */}
-          <div className="flex-1 overflow-y-auto p-5 flex flex-col justify-between no-scrollbar">
+          {/* 遊戲主視窗 - 使用 flex-1 自適應延伸，杜絕行動端裁剪與滾動溢出 */}
+          <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col justify-between no-scrollbar">
             
             {/* ==================== 1. 歡迎與選角頁面 ==================== */}
             {gameState === 'welcome' && (
-              <div className="flex-1 flex flex-col justify-between py-2">
-                <div className="text-center space-y-2 mt-4 animate-fade-in">
-                  <div className="inline-block p-3 bg-indigo-100 rounded-2xl text-3xl mb-1">🛡️🌿</div>
+              <div className="flex-1 flex flex-col justify-between py-1 animate-fade-in">
+                <div className="text-center space-y-2 mt-2">
+                  <div className="inline-block p-3.5 bg-indigo-100/80 rounded-2xl text-4xl mb-1 shadow-sm">🌿🧚‍♂️</div>
                   <h1 className="text-2xl font-black text-indigo-900 tracking-tight">護眼小精靈</h1>
-                  <p className="text-xs font-bold text-indigo-500 tracking-widest uppercase">的能量大冒險 v2.0</p>
-                  <p className="text-xs text-slate-500 px-4">
-                    用眼 20 分鐘，起立活動放鬆眼球！寫下你每一次的「眼球冒險放鬆日記」來賺取水晶吧！
+                  <p className="text-xs font-black text-indigo-500 tracking-widest uppercase">的能量大冒險 v3.0</p>
+                  <p className="text-xs text-slate-500 px-3 leading-relaxed">
+                    看螢幕 20 分鐘，活動眼睛一下！系統會依家長設定的時間派發輕微舒緩或中高強度肢體運動任務！
                   </p>
                 </div>
 
-                <div className="my-5 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                  <label className="block text-xs font-extrabold text-slate-500 mb-2">請輸入小小冒險家名字：</label>
+                {/* 輸入名字 */}
+                <div className="my-4 bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+                  <label className="block text-xs font-black text-slate-500 mb-2">請輸入小小冒險家名字：</label>
                   <input 
                     type="text" 
                     value={kidName}
                     onChange={(e) => setKidName(e.target.value)}
                     placeholder="小寶貝的名字..."
                     maxLength={8}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-center font-bold text-slate-700 bg-slate-50/50"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-center font-black text-slate-700 bg-slate-50/50"
                   />
                 </div>
 
-                <div>
-                  <p className="text-xs font-extrabold text-slate-500 mb-2 text-center">選擇一位護眼精靈夥伴：</p>
+                {/* 選擇小夥伴 */}
+                <div className="space-y-2">
+                  <p className="text-xs font-black text-slate-500 text-center">請點選一位護眼夥伴：</p>
                   <div className="grid grid-cols-3 gap-2.5">
                     {PIXIES.map((pixie) => (
                       <button
                         key={pixie.id}
                         onClick={() => { setSelectedPixieId(pixie.id); if (soundEnabled) playSound('click'); }}
-                        className={`p-3 rounded-2xl border-2 flex flex-col items-center gap-1.5 transition-all ${
+                        className={`p-2.5 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all active:scale-95 ${
                           selectedPixieId === pixie.id 
                             ? `${pixie.borderColor} bg-white shadow-md scale-105` 
-                            : 'border-transparent bg-slate-200/50 opacity-60 hover:opacity-100'
+                            : 'border-transparent bg-slate-200/40 opacity-70 hover:opacity-100'
                         }`}
                       >
                         <span className="text-3xl">{pixie.emoji}</span>
@@ -710,14 +701,16 @@
                   </div>
                 </div>
 
-                <div className="mt-4 bg-white/70 p-3 rounded-xl text-xs text-slate-600 border border-slate-100 flex items-start gap-2 min-h-[64px]">
+                {/* 介紹資訊 */}
+                <div className="mt-3 bg-white/80 p-3 rounded-2xl text-xs text-slate-600 border border-slate-100 flex items-start gap-2">
                   <span className="text-base">💡</span>
-                  <div>
-                    <span className="font-bold text-slate-800">夥伴介紹：</span>
+                  <div className="leading-relaxed">
+                    <span className="font-extrabold text-slate-800">精靈天賦：</span>
                     {selectedPixie.desc}
                   </div>
                 </div>
 
+                {/* 開始按鈕 */}
                 <button
                   onClick={() => {
                     if (soundEnabled) playSound('success');
@@ -726,9 +719,9 @@
                     setTimeLeft(screenTimeSetting * 60);
                   }}
                   disabled={!kidName.trim()}
-                  className={`w-full py-4 mt-6 rounded-2xl font-black text-white shadow-lg flex items-center justify-center gap-2 transition ${
+                  className={`w-full py-3.5 mt-5 rounded-2xl font-black text-white shadow-lg flex items-center justify-center gap-2 transition active:scale-95 ${
                     kidName.trim() 
-                      ? 'bg-gradient-to-r from-indigo-500 to-blue-600 hover:scale-102 active:scale-98' 
+                      ? 'bg-gradient-to-r from-indigo-500 to-blue-600 hover:opacity-95' 
                       : 'bg-slate-300 cursor-not-allowed'
                   }`}
                 >
@@ -738,45 +731,46 @@
               </div>
             )}
 
-            {/* ==================== 2. 主控制台 (用眼計時與精靈陪伴) ==================== */}
+            {/* ==================== 2. 主控制台 ==================== */}
             {gameState === 'dashboard' && (
-              <div className="flex-1 flex flex-col justify-between py-2">
+              <div className="flex-1 flex flex-col justify-between py-1 animate-fade-in">
                 
                 {/* 測試沙盒 */}
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-2 flex flex-col gap-1.5 mb-2 shadow-sm text-xs text-amber-800">
+                <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-2.5 flex flex-col gap-1.5 mb-2 shadow-sm text-xs text-amber-900">
                   <div className="flex justify-between items-center font-bold">
-                    <span>🛠️ 測試沙盒（供您快速體驗）：</span>
-                    <span className="bg-amber-200 px-1.5 py-0.5 rounded text-[10px]">開發者工具</span>
+                    <span>🛠️ 測試沙盒（供您快速體驗功能）：</span>
+                    <span className="bg-amber-200/80 px-1.5 py-0.5 rounded text-[10px] text-amber-950">開發者調試</span>
                   </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => { setIsSpeedUp(!isSpeedUp); if (soundEnabled) playSound('click'); }}
-                      className={`flex-1 py-1 px-2 rounded font-bold text-center border transition text-[11px] ${
+                      className={`flex-1 py-1 px-2 rounded-lg font-black text-center border transition active:scale-95 text-[11px] ${
                         isSpeedUp ? 'bg-amber-600 text-white border-amber-700' : 'bg-white hover:bg-amber-100 border-amber-300'
                       }`}
                     >
-                      🚀 {isSpeedUp ? '加速中 (100x)' : '標準時間 (可開加速)'}
+                      🚀 {isSpeedUp ? '加速中 (100x)' : '標準速度 (可加速)'}
                     </button>
                     <button 
                       onClick={forceTimeOut}
-                      className="flex-1 py-1 px-2 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded transition text-center text-[11px]"
+                      className="flex-1 py-1 px-2 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-black rounded-lg transition text-center text-[11px]"
                     >
-                      ⏰ 模擬時間到！
+                      ⏰ 模擬時間結束
                     </button>
                   </div>
                 </div>
 
-                {/* 精靈區 */}
-                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[160px]">
+                {/* 精靈動畫區 */}
+                <div className="flex-1 flex flex-col items-center justify-center relative min-h-[150px] my-1">
+                  {/* 配件渲染 */}
                   <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
                     {equippedItems.head === 'party_hat' && (
-                      <span className="text-4xl absolute -translate-y-20 translate-x-4 animate-bounce z-10">🥳</span>
+                      <span className="text-3xl absolute -translate-y-16 translate-x-4 animate-bounce z-10">🥳</span>
                     )}
                     {equippedItems.head === 'gold_crown' && (
-                      <span className="text-3xl absolute -translate-y-[84px] z-10 rotate-12">👑</span>
+                      <span className="text-2xl absolute -translate-y-[70px] z-10 rotate-12">👑</span>
                     )}
                     {equippedItems.hand === 'magic_wand' && (
-                      <span className="text-3xl absolute translate-x-16 translate-y-10 z-10 animate-pulse">🪄</span>
+                      <span className="text-2xl absolute translate-x-12 translate-y-8 z-10 animate-pulse">🪄</span>
                     )}
                   </div>
 
@@ -787,44 +781,44 @@
                       false 
                     )}
                     {equippedItems.eyes === 'cool_glasses' && (
-                      <span className="text-4xl absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2 z-10 select-none scale-x-125">🕶️</span>
+                      <span className="text-3xl absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2 z-10 select-none scale-x-125">🕶️</span>
                     )}
                   </div>
 
-                  <div className="mt-2 bg-white px-4 py-1.5 rounded-2xl shadow-sm border border-slate-100 text-xs font-bold text-slate-600 max-w-[85%] text-center animate-pulse">
-                    {calculateFatigue() < 30 && `哈囉，${kidName}！小夥伴正看著你快樂學習喔！`}
-                    {calculateFatigue() >= 30 && calculateFatigue() < 70 && "看螢幕有一陣子了，多眨眼放鬆一下！"}
-                    {calculateFatigue() >= 70 && "眼睛好累喔...等一下計時結束我們趕快休息！"}
+                  <div className="mt-2.5 bg-white px-4 py-1.5 rounded-2xl shadow-sm border border-slate-100 text-xs font-black text-slate-500 max-w-[85%] text-center animate-pulse">
+                    {calculateFatigue() < 30 && `哈囉 ${kidName}！小夥伴現在陪你一起上課看螢幕！`}
+                    {calculateFatigue() >= 30 && calculateFatigue() < 70 && "看螢幕有一陣子了，眼睛累了就眨眨眼哦！"}
+                    {calculateFatigue() >= 70 && "眼睛感覺有點痠累...時間一到我們就去充電探險！"}
                   </div>
                 </div>
 
-                {/* 計時器 */}
-                <div className="bg-white p-5 rounded-3xl shadow-md border border-slate-100 space-y-4">
+                {/* 控制台與計時元件 */}
+                <div className="bg-white p-4 rounded-3xl shadow-md border border-slate-100 space-y-3.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <Icon name="tv" className="text-indigo-500" size={16} />
-                      <span className="text-xs font-extrabold text-slate-500">當前：用眼看螢幕</span>
+                      <Icon name="tv" className="text-indigo-500" size={15} />
+                      <span className="text-xs font-extrabold text-slate-500">當前階段：連續用眼計時</span>
                     </div>
-                    <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
-                      寫日記賺 💎
+                    <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
+                      用眼達 {screenTimeSetting} 分鐘 ⌛
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center justify-between gap-3">
                     <div className="flex-1">
-                      <div className="h-4 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-gradient-to-r from-indigo-400 to-indigo-600 transition-all duration-300"
                           style={{ width: `${(timeLeft / (screenTimeSetting * 60)) * 100}%` }}
                         ></div>
                       </div>
-                      <div className="flex justify-between text-[10px] text-slate-400 font-bold mt-1">
-                        <span>剩下 {Math.ceil(timeLeft / 60)} 分鐘</span>
-                        <span>總時長 {screenTimeSetting} 分鐘</span>
+                      <div className="flex justify-between text-[9px] text-slate-400 font-black mt-1">
+                        <span>剩餘時間 {Math.ceil(timeLeft / 60)} 分鐘</span>
+                        <span>家長設定上限 {screenTimeSetting} 分鐘</span>
                       </div>
                     </div>
 
-                    <div className="text-2xl font-black text-slate-700 tabular-nums">
+                    <div className="text-xl font-black text-slate-700 tabular-nums">
                       {formatTime(timeLeft)}
                     </div>
                   </div>
@@ -835,142 +829,153 @@
                         if (soundEnabled) playSound('click');
                         setIsActive(!isActive);
                       }}
-                      className={`flex-1 py-3 rounded-xl font-extrabold flex items-center justify-center gap-2 transition ${
+                      className={`flex-1 py-2.5 rounded-xl font-black flex items-center justify-center gap-2 transition text-xs active:scale-95 ${
                         isActive 
-                          ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-300' 
-                          : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md'
+                          ? 'bg-amber-100 text-amber-700 border border-amber-200' 
+                          : 'bg-indigo-600 text-white shadow-sm'
                       }`}
                     >
-                      {isActive ? <Icon name="pause" size={16} /> : <Icon name="play" size={16} fill="currentColor" />}
+                      <Icon name={isActive ? "pause" : "play"} size={14} />
                       <span>{isActive ? '暫停計時' : '繼續守護'}</span>
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-2">
+                {/* 附屬入口 */}
+                <div className="mt-3.5 grid grid-cols-2 gap-2">
                   <button 
                     onClick={() => { if (soundEnabled) playSound('click'); setGameState('shop'); }}
-                    className="bg-white/80 border border-indigo-100 hover:bg-indigo-50 py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold text-indigo-700 transition"
+                    className="bg-white/90 border border-indigo-100 hover:bg-indigo-50 active:scale-95 py-3 px-4 rounded-2xl flex items-center justify-center gap-1.5 text-xs font-black text-indigo-700 transition"
                   >
-                    <Icon name="shopping-bag" size={14} />
-                    <span>魔法商店</span>
+                    <Icon name="shopping-bag" size={13} />
+                    <span>精靈商店</span>
                   </button>
                   <button 
                     onClick={() => { if (soundEnabled) playSound('click'); setGameState('closet'); }}
-                    className="bg-white/80 border border-pink-100 hover:bg-pink-50 py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold text-pink-700 transition"
+                    className="bg-white/90 border border-pink-100 hover:bg-pink-50 active:scale-95 py-3 px-4 rounded-2xl flex items-center justify-center gap-1.5 text-xs font-black text-pink-700 transition"
                   >
-                    <Icon name="award" size={14} />
-                    <span>精靈試衣間</span>
+                    <Icon name="award" size={13} />
+                    <span>精靈裝扮</span>
                   </button>
                 </div>
 
               </div>
             )}
 
-            {/* ==================== 3. 休息模式 (放鬆任務 + 雙眼日記) ==================== */}
+            {/* ==================== 3. 休息模式 (智慧派發任務與日記) ==================== */}
             {gameState === 'resting' && (
-              <div className="flex-1 flex flex-col justify-between py-1 animate-fade-in space-y-4">
+              <div className="flex-1 flex flex-col justify-between py-1 animate-fade-in space-y-3">
                 
                 <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 bg-red-100 border border-red-200 text-red-700 rounded-full text-xs font-bold animate-pulse flex items-center gap-1">
-                    <span>💤</span> 精靈充電休息中
+                  <span className="px-2.5 py-1 bg-red-100 border border-red-200 text-red-700 rounded-full text-xs font-black animate-pulse flex items-center gap-1">
+                    <span>💤</span> 小夥伴閉眼充電中...
                   </span>
                   <div className="flex items-center gap-1 text-xs text-slate-500 font-bold">
-                    <Icon name="timer" size={14} />
-                    <span>倒數: {formatTime(timeLeft)}</span>
+                    <Icon name="timer" size={13} />
+                    <span>剩餘休息: {formatTime(timeLeft)}</span>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 text-white p-4 rounded-3xl shadow-lg relative overflow-hidden space-y-2">
-                  <div className="absolute right-2 bottom-2 text-5xl opacity-10 select-none">🌿</div>
+                {/* 智慧派發之實體放鬆卡片 */}
+                <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white p-4.5 rounded-3xl shadow-lg relative overflow-hidden space-y-2">
+                  <div className="absolute right-2 bottom-1 text-5xl opacity-10 select-none">🛡️</div>
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black uppercase bg-white/20 px-2.5 py-0.5 rounded-full">
-                      🏃 實體冒險任務
+                    <span className="text-[9px] font-black uppercase bg-white/20 px-2 py-0.5 rounded-full">
+                      🏃‍♂️ 實體冒險放鬆卡
                     </span>
-                    <span className="text-[10px] font-bold text-yellow-200">完成可記錄並賺取 💎</span>
+                    <span className="text-[9px] font-extrabold text-yellow-300">
+                      💡 依據您用眼達 {screenTimeSetting} 分鐘派出
+                    </span>
                   </div>
-                  <p className="text-xs font-bold leading-relaxed text-yellow-50">
+                  
+                  {/* 派發任務說明 */}
+                  <p className="text-xs font-black leading-relaxed text-yellow-100">
                     {currentQuest?.text}
                   </p>
+
+                  <div className="border-t border-white/20 pt-2 flex justify-between items-center text-[10px] text-indigo-200 font-bold">
+                    <span>分類：{currentQuest?.categoryName}</span>
+                    <span>過關獎勵：💎 15~25 水晶</span>
+                  </div>
                 </div>
 
-                {/* 眼球冒險日記記錄區 */}
-                <div className="bg-white p-4 rounded-3xl border border-indigo-100 shadow-sm space-y-4">
+                {/* 眼球日記記錄 */}
+                <div className="bg-white p-4 rounded-3xl border border-indigo-100 shadow-sm space-y-3.5">
                   
-                  {/* 眼睛舒適度評估 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs font-black text-slate-700 flex items-center gap-1">
-                      <Icon name="smile" size={14} className="text-indigo-500" />
-                      <span>1. 做完任務，你現在的眼睛感覺如何？</span>
+                  {/* 放鬆度 */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-black text-slate-600 flex items-center gap-1">
+                      <Icon name="smile" size={13} className="text-indigo-500" />
+                      <span>1. 動一動完，現在眼睛覺得如何呢？</span>
                     </label>
                     
                     <div className="grid grid-cols-3 gap-2">
                       <button
                         type="button"
                         onClick={() => { if (soundEnabled) playSound('click'); setEyeComfortScore('tired'); }}
-                        className={`py-2 px-3 rounded-xl border flex flex-col items-center gap-1 transition ${
+                        className={`py-1.5 px-2.5 rounded-xl border flex flex-col items-center gap-0.5 transition active:scale-95 ${
                           eyeComfortScore === 'tired' 
-                            ? 'border-red-400 bg-red-50 text-red-600 font-bold scale-102 shadow-sm' 
-                            : 'border-slate-100 bg-slate-50/50 text-slate-400 hover:bg-slate-50'
+                            ? 'border-red-400 bg-red-50 text-red-600 font-black' 
+                            : 'border-slate-150 bg-slate-50/50 text-slate-400'
                         }`}
                       >
-                        <span className="text-2xl">😣</span>
-                        <span className="text-[10px]">還是有點酸</span>
+                        <span className="text-lg">😣</span>
+                        <span className="text-[9px]">還是有點累</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => { if (soundEnabled) playSound('click'); setEyeComfortScore('medium'); }}
-                        className={`py-2 px-3 rounded-xl border flex flex-col items-center gap-1 transition ${
+                        className={`py-1.5 px-2.5 rounded-xl border flex flex-col items-center gap-0.5 transition active:scale-95 ${
                           eyeComfortScore === 'medium' 
-                            ? 'border-amber-400 bg-amber-50 text-amber-600 font-bold scale-102 shadow-sm' 
-                            : 'border-slate-100 bg-slate-50/50 text-slate-400 hover:bg-slate-50'
+                            ? 'border-amber-400 bg-amber-50 text-amber-600 font-black' 
+                            : 'border-slate-150 bg-slate-50/50 text-slate-400'
                         }`}
                       >
-                        <span className="text-2xl">😐</span>
-                        <span className="text-[10px]">舒服了一點</span>
+                        <span className="text-lg">😐</span>
+                        <span className="text-[9px]">舒服多了</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => { if (soundEnabled) playSound('click'); setEyeComfortScore('good'); }}
-                        className={`py-2 px-3 rounded-xl border flex flex-col items-center gap-1 transition ${
+                        className={`py-1.5 px-2.5 rounded-xl border flex flex-col items-center gap-0.5 transition active:scale-95 ${
                           eyeComfortScore === 'good' 
-                            ? 'border-emerald-400 bg-emerald-50 text-emerald-600 font-bold scale-102 shadow-sm' 
-                            : 'border-slate-100 bg-slate-50/50 text-slate-400 hover:bg-slate-50'
+                            ? 'border-emerald-400 bg-emerald-50 text-emerald-600 font-black' 
+                            : 'border-slate-150 bg-slate-50/50 text-slate-400'
                         }`}
                       >
-                        <span className="text-2xl">😌</span>
-                        <span className="text-[10px]">超級放鬆！</span>
+                        <span className="text-lg">😌</span>
+                        <span className="text-[9px]">超級放鬆！</span>
                       </button>
                     </div>
                   </div>
 
-                  {/* 成果文字輸入與快捷貼紙 */}
-                  <div className="space-y-2">
-                    <label className="block text-xs font-black text-slate-700 flex items-center gap-1">
-                      <Icon name="pencil" size={14} className="text-indigo-500" />
-                      <span>2. 填寫冒險日記（可自填或點選貼紙）</span>
+                  {/* 自填與快捷筆記 */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-black text-slate-600 flex items-center gap-1">
+                      <Icon name="pencil" size={13} className="text-indigo-500" />
+                      <span>2. 填寫放鬆小日記（可點選快捷貼紙）</span>
                     </label>
                     
                     <textarea
                       rows={2}
                       value={restingNote}
                       onChange={(e) => setRestingNote(e.target.value)}
-                      placeholder="例如：我看到窗外有三棵大樹、我閉上眼睛聽到了鳥叫聲！"
-                      className="w-full p-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 font-medium text-slate-600 resize-none bg-slate-50/50"
+                      placeholder="寫下或點選你剛才做了什麼..."
+                      className="w-full p-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 font-bold text-slate-600 resize-none bg-slate-50/50"
                     />
 
                     {/* 快捷貼紙 */}
                     <div className="space-y-1">
-                      <p className="text-[9px] text-slate-400 font-bold">👉 快捷小貼紙（點擊一鍵記錄）：</p>
-                      <div className="flex flex-wrap gap-1.5 max-h-[85px] overflow-y-auto pr-1 no-scrollbar">
+                      <p className="text-[9px] text-slate-400 font-bold">👉 快捷小貼紙 (點擊一鍵記錄)：</p>
+                      <div className="flex flex-wrap gap-1.5 max-h-[80px] overflow-y-auto pr-1 no-scrollbar">
                         {QUICK_NOTES.map((qn, idx) => (
                           <button
                             key={idx}
                             type="button"
                             onClick={() => handleQuickNoteClick(qn.text)}
-                            className="text-[9px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold px-2 py-1 rounded-lg border border-indigo-100 transition active:scale-95"
+                            className="text-[9px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-0.5 rounded-lg border border-indigo-100 transition active:scale-95"
                           >
                             {qn.text}
                           </button>
@@ -983,8 +988,8 @@
 
                 {/* 沉睡小精靈 */}
                 <div className="flex justify-center py-1">
-                  <div className="relative scale-75 origin-center">
-                    <span className="absolute text-xl font-bold text-indigo-400 -translate-y-12 translate-x-12 animate-bounce-slow">Zzz</span>
+                  <div className="relative scale-65 origin-center -my-2">
+                    <span className="absolute text-xl font-black text-indigo-400 -translate-y-12 translate-x-12 animate-bounce-slow">Zzz</span>
                     {selectedPixie.svgBody(
                       selectedPixieId === 'alu' ? '#047857' : selectedPixieId === 'momo' ? '#be123c' : '#0369a1',
                       true,
@@ -996,36 +1001,33 @@
                 <div className="space-y-1">
                   <button
                     onClick={completeBreakSuccess}
-                    className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:scale-102 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition"
+                    className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-95 active:scale-95 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition"
                   >
-                    <Icon name="check-circle" size={18} />
-                    <span>儲存日記並獲得能量！</span>
+                    <Icon name="check-circle" size={17} />
+                    <span>儲存眼球日記 ＋ 解鎖螢幕！</span>
                   </button>
-                  <div className="text-center text-[10px] text-slate-400 font-semibold">
-                    * 寫好日記再點擊提交，能獲得更豐富的水晶獎勵喔！
-                  </div>
                 </div>
 
               </div>
             )}
 
-            {/* ==================== 4. 成功與收穫頁面 ==================== */}
+            {/* ==================== 4. 成功過關結算 ==================== */}
             {gameState === 'success' && (
-              <div className="flex-1 flex flex-col justify-between py-2 text-center animate-fade-in">
+              <div className="flex-1 flex flex-col justify-between py-1 text-center animate-fade-in">
                 <div className="space-y-1 mt-2">
                   <div className="inline-block p-3 bg-yellow-100 rounded-full text-3xl animate-pulse">
-                    🎉💎✨
+                    🎉✨💎
                   </div>
-                  <h2 className="text-xl font-black text-indigo-900">太棒了，完成充電！</h2>
-                  <p className="text-xs text-slate-500 px-6">
-                    {kidName} 的眼睛重獲能量！看看你剛剛寫下的紀錄吧：
+                  <h2 className="text-xl font-black text-indigo-900">充電成功！眼睛恢復元氣</h2>
+                  <p className="text-xs text-slate-500 px-5 leading-relaxed">
+                    太棒了，{kidName} 的眼睛得到了充裕的休息！精靈夥伴也元氣滿滿囉：
                   </p>
                 </div>
 
-                {/* 剛剛儲存的日記展示 */}
+                {/* 日記回顧 */}
                 {lastSavedLog && (
                   <div className="my-2 bg-white/90 border-2 border-dashed border-indigo-200 p-4 rounded-3xl max-w-[90%] mx-auto shadow-sm text-left relative overflow-hidden">
-                    <div className="absolute right-2 top-2 text-2xl opacity-10 font-bold select-none">
+                    <div className="absolute right-2 top-1 text-2xl opacity-10 font-bold select-none">
                       📖
                     </div>
                     
@@ -1034,29 +1036,30 @@
                         {lastSavedLog.comfort === 'good' ? '😌' : lastSavedLog.comfort === 'medium' ? '😐' : '😣'}
                       </span>
                       <div>
-                        <h4 className="text-xs font-black text-slate-800">眼球探險日記成果</h4>
-                        <p className="text-[9px] text-slate-400 font-semibold">{lastSavedLog.time}</p>
+                        <h4 className="text-xs font-black text-slate-800">眼球探險日記回顧</h4>
+                        <p className="text-[9px] text-slate-400 font-bold">{lastSavedLog.time}</p>
                       </div>
                     </div>
 
-                    <p className="text-xs font-bold text-indigo-900 bg-indigo-50/50 p-2 rounded-xl italic leading-relaxed">
+                    <p className="text-xs font-black text-indigo-900 bg-indigo-50/50 p-2.5 rounded-xl italic leading-relaxed">
                       「 {lastSavedLog.note} 」
                     </p>
 
-                    <div className="mt-3 flex justify-between items-center text-[10px] text-slate-500 font-bold">
-                      <span>雙眼放鬆度評分：</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] ${
+                    <div className="mt-2.5 flex justify-between items-center text-[9px] text-slate-500 font-bold">
+                      <span>雙眼舒服感受：</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[8px] ${
                         lastSavedLog.comfort === 'good' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
                         lastSavedLog.comfort === 'medium' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
                         'bg-red-50 text-red-600 border border-red-100'
                       }`}>
-                        {lastSavedLog.comfort === 'good' ? '超級放鬆！' : lastSavedLog.comfort === 'medium' ? '舒服了一點' : '依然有點累'}
+                        {lastSavedLog.comfort === 'good' ? '非常舒服！' : lastSavedLog.comfort === 'medium' ? '稍微好一些' : '仍有點乾澀'}
                       </span>
                     </div>
                   </div>
                 )}
 
-                <div className="my-2 flex flex-col items-center justify-center">
+                {/* 精靈動畫 */}
+                <div className="my-1 flex flex-col items-center justify-center">
                   <div className="animate-bounce">
                     {selectedPixie.svgBody(
                       selectedPixieId === 'alu' ? '#10b981' : selectedPixieId === 'momo' ? '#f43f5e' : '#0ea5e9',
@@ -1065,65 +1068,65 @@
                     )}
                   </div>
                   <p className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100 mt-2">
-                    ✨ 獲得水晶 💎 {lastSavedLog?.reward || 20} 枚！
+                    本次獲得的水晶 💎 + {lastSavedLog?.reward || 20} 枚！
                   </p>
                 </div>
 
                 <button
                   onClick={startNextScreenSession}
-                  className="w-full py-4 bg-gradient-to-r from-indigo-500 to-blue-600 hover:scale-102 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition"
+                  className="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-blue-600 hover:opacity-95 active:scale-95 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition"
                 >
-                  <span>進入下一回合守護</span>
-                  <Icon name="chevron-right" size={18} />
+                  <span>開啟下一回合護眼挑戰</span>
+                  <Icon name="chevron-right" size={16} />
                 </button>
               </div>
             )}
 
-            {/* ==================== 5. 魔法商店 ==================== */}
+            {/* ==================== 5. 商店 ==================== */}
             {gameState === 'shop' && (
               <div className="flex-1 flex flex-col justify-between py-1 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-1.5">
-                    <Icon name="shopping-bag" className="text-indigo-600" size={18} />
+                    <Icon name="shopping-bag" className="text-indigo-600" size={17} />
                     <h2 className="text-md font-black text-slate-800">精靈魔法商店</h2>
                   </div>
                   <button 
                     onClick={() => { if (soundEnabled) playSound('click'); setGameState('dashboard'); }}
-                    className="text-xs font-bold text-slate-400 hover:text-slate-600 animate-pulse"
+                    className="text-xs font-black text-slate-400 hover:text-slate-600"
                   >
                     返回小屋 ➔
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto my-3 space-y-2.5 max-h-[380px] pr-1 no-scrollbar">
+                <div className="flex-1 overflow-y-auto my-3 space-y-2 max-h-[360px] pr-1 no-scrollbar">
                   {SHOP_ITEMS.map((item) => {
                     const isOwned = ownedItems.includes(item.id);
                     return (
                       <div 
                         key={item.id} 
-                        className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between gap-3"
+                        className="bg-white p-2.5 rounded-2xl border border-slate-150 shadow-sm flex items-center justify-between gap-2"
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="text-3xl bg-slate-100 p-2 rounded-xl">{item.emoji}</span>
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-2xl bg-slate-100 p-2 rounded-xl">{item.emoji}</span>
                           <div>
                             <p className="text-xs font-black text-slate-800">{item.name}</p>
-                            <p className="text-[10px] text-slate-400">穿戴後小精靈更可愛喔！</p>
+                            <p className="text-[10px] text-slate-400">買給精靈打扮更帥氣！</p>
                           </div>
                         </div>
 
                         <div>
                           {isOwned ? (
-                            <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full">
+                            <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
                               已擁有
                             </span>
                           ) : (
                             <button
                               onClick={() => buyItem(item)}
                               disabled={crystals < item.price}
-                              className={`px-3 py-1.5 rounded-full font-black text-xs transition flex items-center gap-1 ${
+                              className={`px-3 py-1.5 rounded-full font-black text-xs transition active:scale-95 ${
                                 crystals >= item.price 
                                   ? 'bg-yellow-400 hover:bg-yellow-500 text-yellow-950' 
-                                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                                  : 'bg-slate-200 text-slate-400'
                               }`}
                             >
                               <span>💎 {item.price}</span>
@@ -1144,23 +1147,23 @@
               </div>
             )}
 
-            {/* ==================== 6. 精靈試衣間 ==================== */}
+            {/* ==================== 6. 試衣間 ==================== */}
             {gameState === 'closet' && (
               <div className="flex-1 flex flex-col justify-between py-1 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-1.5">
-                    <Icon name="award" className="text-pink-600" size={18} />
+                    <Icon name="award" className="text-pink-600" size={17} />
                     <h2 className="text-md font-black text-slate-800">精靈試衣間</h2>
                   </div>
                   <button 
                     onClick={() => { if (soundEnabled) playSound('click'); setGameState('dashboard'); }}
-                    className="text-xs font-bold text-slate-400 hover:text-slate-600"
+                    className="text-xs font-black text-slate-400 hover:text-slate-600"
                   >
                     返回小屋 ➔
                   </button>
                 </div>
 
-                <div className="my-4 flex flex-col items-center justify-center relative bg-white/40 rounded-2xl p-4 border border-slate-100">
+                <div className="my-3 flex flex-col items-center justify-center relative bg-white/40 rounded-3xl p-4 border border-slate-100">
                   <div className="relative">
                     {selectedPixie.svgBody(
                       selectedPixieId === 'alu' ? '#10b981' : selectedPixieId === 'momo' ? '#f43f5e' : '#0ea5e9',
@@ -1181,11 +1184,11 @@
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto max-h-[220px] mb-3 no-scrollbar">
-                  <p className="text-xs font-extrabold text-slate-500 mb-2">已擁有的服飾：</p>
+                <div className="flex-1 overflow-y-auto max-h-[200px] mb-3 no-scrollbar">
+                  <p className="text-xs font-black text-slate-500 mb-2">已解鎖配飾：</p>
                   {ownedItems.length === 0 ? (
-                    <div className="text-center py-8 bg-white/50 rounded-2xl text-xs text-slate-400">
-                      目前衣櫃裡空空的，快去魔法商店買新衣服吧！🛒
+                    <div className="text-center py-7 bg-white/50 rounded-2xl text-xs text-slate-400">
+                      衣櫃空空！快去商店購買第一件配飾吧！🛒
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-2">
@@ -1195,16 +1198,16 @@
                           <button
                             key={item.id}
                             onClick={() => toggleEquipItem(item)}
-                            className={`p-3 rounded-xl border flex items-center gap-2 transition ${
+                            className={`p-2.5 rounded-xl border flex items-center gap-2 transition active:scale-95 ${
                               isEquipped 
                                 ? 'border-pink-400 bg-pink-50 text-pink-700 font-extrabold' 
                                 : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                             }`}
                           >
-                            <span className="text-2xl">{item.emoji}</span>
+                            <span className="text-xl">{item.emoji}</span>
                             <div className="text-left">
-                              <p className="text-xs font-bold leading-none">{item.name}</p>
-                              <p className="text-[9px] text-slate-400 mt-1">{isEquipped ? '脫下' : '穿上'}</p>
+                              <p className="text-[11px] font-black leading-none">{item.name}</p>
+                              <p className="text-[9px] text-slate-400 mt-1">{isEquipped ? '已穿戴（脫下）' : '點擊穿上'}</p>
                             </div>
                           </button>
                         );
@@ -1224,15 +1227,15 @@
 
           </div>
 
-          {/* ==================== 7. 家長控制台 Modal (安全心算鎖 + 成果審查) ==================== */}
+          {/* ==================== 7. 家長控制台 Modal (安全心算鎖 + 時間任務指派設定) ==================== */}
           {parentModalOpen && (
             <div className="absolute inset-0 bg-slate-900/85 backdrop-blur-sm z-50 flex items-end justify-center">
-              <div className="w-full bg-white rounded-t-[32px] p-6 space-y-4 max-h-[90%] overflow-y-auto animate-slide-up no-scrollbar">
+              <div className="w-full bg-white rounded-t-[32px] p-6 space-y-4 max-h-[92%] overflow-y-auto animate-slide-up no-scrollbar">
                 
                 <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                  <div className="flex items-center gap-2">
-                    <Icon name="lock" size={18} className="text-orange-500" />
-                    <h3 className="text-md font-black text-slate-800">家長控制與冒險日記中心</h3>
+                  <div className="flex items-center gap-1.5">
+                    <Icon name="lock" size={17} className="text-orange-500" />
+                    <h3 className="text-sm font-black text-slate-800">家長防誤觸控制台 v3.0</h3>
                   </div>
                   <button 
                     onClick={() => { if (soundEnabled) playSound('click'); setParentModalOpen(false); }}
@@ -1242,22 +1245,21 @@
                   </button>
                 </div>
 
-                {/* 心算防誤觸驗證鎖 */}
+                {/* 家長心算安全防護鎖 */}
                 {!parentPinSolved ? (
-                  <div className="space-y-4 py-4 text-center">
-                    <div className="inline-block p-2 bg-orange-100 rounded-xl text-orange-600 mb-1">
+                  <div className="space-y-4 py-3 text-center">
+                    <div className="inline-block p-2 bg-orange-100 rounded-xl text-orange-600 mb-0.5">
                       <Icon name="shield-alert" size={20} />
                     </div>
                     <p className="text-xs text-slate-500">
-                      此區域包含孩子實體任務日記。請大人解答下方算術鎖進入：
+                      此區域包含孩子用眼設定與探險成果。請大人解開以下算術鎖進入：
                     </p>
                     <div className="bg-slate-100 py-3 rounded-2xl text-lg font-black text-slate-700 tracking-wider">
                       {parentMathQuiz.num1} × {parentMathQuiz.num2} = ?
                     </div>
                     
-                    {/* 心算錯誤友善提示區 (符合無 browser alert 原則) */}
                     {parentError && (
-                      <p className="text-xs font-bold text-red-500 bg-red-50 p-2 rounded-xl border border-red-100 animate-shake">
+                      <p className="text-xs font-black text-red-500 bg-red-50 p-2 rounded-xl border border-red-100">
                         ⚠️ {parentError}
                       </p>
                     )}
@@ -1272,56 +1274,28 @@
                       />
                       <button
                         onClick={verifyParentAnswer}
-                        className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-extrabold rounded-xl transition text-sm"
+                        className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-extrabold rounded-xl transition text-xs"
                       >
-                        驗證
+                        確認解鎖
                       </button>
                     </div>
                   </div>
                 ) : (
-                  // 家長中心主控面板
+                  // 家長中心進階面板
                   <div className="space-y-5">
                     
-                    {/* 探險日記審查 */}
+                    {/* 第一板塊：用眼與休息時間設定 */}
                     <div className="space-y-2">
-                      <h4 className="text-xs font-black text-slate-700 flex items-center gap-1">
-                        <Icon name="book-open" size={14} className="text-indigo-600" />
-                        <span>✨ 孩子寫下的「護眼充電日記」({historyLogs.length})</span>
+                      <h4 className="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                        <Icon name="clock" size={13} className="text-indigo-500" />
+                        <span>1. 連續螢幕時間設定</span>
                       </h4>
+                      <p className="text-[10px] text-slate-400 leading-none">設定的時間將影響後續派發放鬆任務的輕重層級</p>
                       
-                      <div className="bg-slate-50 rounded-xl p-2.5 max-h-[160px] overflow-y-auto space-y-2 border border-slate-150 no-scrollbar">
-                        {historyLogs.map(log => (
-                          <div key={log.id} className="bg-white p-2.5 rounded-lg border border-slate-100 text-xs shadow-2xs">
-                            <div className="flex justify-between items-center border-b border-slate-50 pb-1.5 mb-1.5 text-[10px]">
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs">
-                                  {log.comfort === 'good' ? '😌' : log.comfort === 'medium' ? '😐' : '😣'}
-                                </span>
-                                <span className="text-slate-400 font-semibold">{log.time}</span>
-                              </div>
-                              <span className="text-yellow-600 font-black">💎 +{log.reward}</span>
-                            </div>
-                            <div className="space-y-1 text-[11px]">
-                              <p className="font-extrabold text-indigo-900">{log.action}</p>
-                              <p className="text-slate-600 bg-indigo-50/20 p-1.5 rounded-md italic">
-                                📝 「 {log.note} 」
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* 用眼/休息時間設定 */}
-                    <div className="space-y-2">
-                      <h4 className="text-xs font-black text-slate-700 flex items-center gap-1">
-                        <Icon name="timer" size={14} />
-                        <span>1. 用眼與休息時間設定</span>
-                      </h4>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-150">
-                          <label className="block text-[10px] text-slate-500 font-extrabold mb-1">螢幕使用時間</label>
-                          <div className="flex items-center gap-1.5">
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-150">
+                          <label className="block text-[10px] text-slate-500 font-black mb-1">用眼時間上限</label>
+                          <div className="flex items-center gap-1">
                             <input 
                               type="number" 
                               min={1} 
@@ -1332,15 +1306,15 @@
                                 setScreenTimeSetting(v);
                                 if (timerMode === 'screen') setTimeLeft(v * 60);
                               }}
-                              className="w-16 px-1.5 py-1 text-center font-black border rounded text-xs"
+                              className="w-14 px-1 py-1 text-center font-black border rounded text-xs"
                             />
                             <span className="text-xs text-slate-600 font-bold">分鐘</span>
                           </div>
                         </div>
 
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-150">
-                          <label className="block text-[10px] text-slate-500 font-extrabold mb-1">休息放鬆時間</label>
-                          <div className="flex items-center gap-1.5">
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-150">
+                          <label className="block text-[10px] text-slate-500 font-black mb-1">休息放鬆時間</label>
+                          <div className="flex items-center gap-1">
                             <input 
                               type="number" 
                               min={1} 
@@ -1351,65 +1325,130 @@
                                 setBreakTimeSetting(v);
                                 if (timerMode === 'break') setTimeLeft(v * 60);
                               }}
-                              className="w-16 px-1.5 py-1 text-center font-black border rounded text-xs"
+                              className="w-14 px-1 py-1 text-center font-black border rounded text-xs"
                             />
                             <span className="text-xs text-slate-600 font-bold">分鐘</span>
                           </div>
                         </div>
                       </div>
+                      
+                      {/* 依時間派發機制科普說明 */}
+                      <div className="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100 text-[10px] text-indigo-700 space-y-1">
+                        <span className="font-black">💡 當前的時間派發邏輯：</span>
+                        <p>。 螢幕設定 <span className="font-bold">≤ 15 分鐘</span>：指派【快速熱敷 / 眨眼】等超輕量放鬆。</p>
+                        <p>。 螢幕設定 <span className="font-bold">16 ~ 29 分鐘</span>：指派【遠眺植物 / 家事學 / 全感聆聽】任務。</p>
+                        <p>。 螢幕設定 <span className="font-bold">≥ 30 分鐘</span>：強制指派【全身大肌肉運動】，緩解久坐疲勞！</p>
+                      </div>
                     </div>
 
-                    {/* 自訂實體充電任務 */}
+                    {/* 第二板塊：自訂實體充電任務庫（可自訂對應時間門檻） */}
                     <div className="space-y-2">
-                      <h4 className="text-xs font-black text-slate-700 flex items-center gap-1">
-                        <Icon name="plus" size={14} />
-                        <span>2. 自訂實體充電任務 (共 {customQuests.length} 個)</span>
+                      <h4 className="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                        <Icon name="plus" size={13} className="text-indigo-500" />
+                        <span>2. 自訂實體放鬆任務及「時間門檻」</span>
                       </h4>
                       
                       <form onSubmit={handleAddQuest} className="space-y-2">
-                        <div className="flex gap-2">
-                          <select 
-                            value={newQuestCategory}
-                            onChange={(e) => setNewQuestCategory(e.target.value)}
-                            className="px-2 py-1.5 bg-slate-100 border rounded-lg text-xs font-bold focus:outline-none"
-                          >
-                            <option value="body">🏃‍♂️ 動肢體</option>
-                            <option value="vision">👁️ 望遠遠眺</option>
-                            <option value="mind">🧘 眼放鬆</option>
-                            <option value="chore">🧹 輕家事</option>
-                          </select>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] text-slate-400 font-bold">任務屬性</label>
+                            <select 
+                              value={newQuestCategory}
+                              onChange={(e) => setNewQuestCategory(e.target.value)}
+                              className="px-2 py-1.5 bg-slate-50 border rounded-lg text-xs font-bold focus:outline-none"
+                            >
+                              <option value="body">🏃‍♂️ 全身大動動</option>
+                              <option value="vision">👁️ 遠眺綠植物</option>
+                              <option value="mind">🧘 輕眼睫放鬆</option>
+                              <option value="chore">🧹 家事小幫手</option>
+                            </select>
+                          </div>
+                          
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] text-slate-400 font-bold">最少需看螢幕幾分鐘才派發？</label>
+                            <div className="flex items-center gap-1">
+                              <input 
+                                type="number"
+                                min={0}
+                                max={60}
+                                value={newQuestMinTime}
+                                onChange={(e) => setNewQuestMinTime(Math.max(0, parseInt(e.target.value) || 0))}
+                                className="w-16 px-2 py-1 border rounded-lg text-xs font-bold focus:outline-none"
+                              />
+                              <span className="text-[10px] text-slate-500 font-bold">分鐘</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[9px] text-slate-400 font-bold">任務敘述文字</label>
                           <input 
                             type="text" 
                             value={newQuestText}
                             onChange={(e) => setNewQuestText(e.target.value)}
-                            placeholder="自訂新任務..."
-                            className="flex-1 px-3 py-1.5 border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                            placeholder="如：走到陽台看大樹 15 秒..."
+                            className="w-full px-3 py-1.5 border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400 font-bold"
                           />
                         </div>
+
                         <button 
                           type="submit" 
-                          className="w-full py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 font-extrabold rounded-lg text-xs transition"
+                          className="w-full py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-lg text-xs transition active:scale-95"
                         >
-                          ＋ 加入實體任務庫
+                          ＋ 儲存並加入隨機任務庫
                         </button>
                       </form>
 
-                      <div className="bg-slate-50 rounded-xl p-2 max-h-[120px] overflow-y-auto space-y-1.5 border border-slate-150 no-scrollbar">
+                      {/* 家長任務庫清單與各別時間門檻審查 */}
+                      <div className="bg-slate-50 rounded-xl p-2.5 max-h-[140px] overflow-y-auto space-y-1.5 border border-slate-150 no-scrollbar">
                         {customQuests.map((q) => (
-                          <div key={q.id} className="flex justify-between items-start bg-white p-2 rounded-lg border border-slate-100 text-[11px] gap-2">
+                          <div key={q.id} className="flex justify-between items-start bg-white p-2 rounded-lg border border-slate-100 text-[10px] gap-2">
                             <div className="flex-1">
-                              <span className="font-extrabold text-[9px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 mr-1.5">
+                              <span className="font-extrabold text-[8px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 mr-1.5">
                                 {q.categoryName}
                               </span>
-                              <span className="text-slate-600">{q.text}</span>
+                              <span className="font-black text-[8px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 mr-1">
+                                用眼 ≥ {q.minScreenTime} 分鐘派發
+                              </span>
+                              <p className="text-slate-600 mt-1 leading-relaxed font-semibold">{q.text}</p>
                             </div>
                             <button 
                               type="button"
                               onClick={() => handleDeleteQuest(q.id)}
                               className="text-red-500 hover:text-red-700 p-0.5"
                             >
-                              <Icon name="trash-2" size={12} />
+                              <Icon name="trash-2" size={11} />
                             </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 第三板塊：孩子眼球日記審查 */}
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                        <Icon name="book-open" size={13} className="text-indigo-600" />
+                        <span>✨ 今日孩子寫下的「眼球探險日記」({historyLogs.length})</span>
+                      </h4>
+                      
+                      <div className="bg-slate-50 rounded-xl p-2.5 max-h-[140px] overflow-y-auto space-y-2 border border-slate-150 no-scrollbar">
+                        {historyLogs.map(log => (
+                          <div key={log.id} className="bg-white p-2.5 rounded-lg border border-slate-100 text-xs shadow-2xs">
+                            <div className="flex justify-between items-center border-b border-slate-50 pb-1.5 mb-1.5 text-[9px]">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs">
+                                  {log.comfort === 'good' ? '😌' : log.comfort === 'medium' ? '😐' : '😣'}
+                                </span>
+                                <span className="text-slate-400 font-black">{log.time}</span>
+                              </div>
+                              <span className="text-yellow-600 font-black">💎 + {log.reward} 水晶</span>
+                            </div>
+                            <div className="space-y-1 text-[10px]">
+                              <p className="font-black text-indigo-900">{log.action}</p>
+                              <p className="text-slate-600 bg-indigo-50/20 p-1.5 rounded-md italic font-bold">
+                                📝 「 {log.note} 」
+                              </p>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1422,7 +1461,7 @@
                   onClick={() => { if (soundEnabled) playSound('click'); setParentModalOpen(false); }}
                   className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-xl transition text-xs mt-2"
                 >
-                  關閉並返回
+                  關閉控制中心
                 </button>
               </div>
             </div>
@@ -1432,7 +1471,7 @@
       );
     }
 
-    // 將 React 應用程式渲染至頁面
+    // 啟動 React 應用程式掛載
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
